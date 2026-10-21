@@ -1,0 +1,512 @@
+---
+title: "Tutorial 1 · Reproducible Research Workflow"
+subtitle: "Empirical Research in Accounting, Auditing and Capital Markets · WS 2026/27"
+author: "Your Name"
+date: "22 October 2026"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "", message = FALSE, warning = FALSE)
+```
+
+# How to use this document
+
+This R Markdown belongs to the slides of **Tutorial 1**. Whenever a slide shows the blue **▶ IN RSTUDIO** bar, switch to this document and work on the part and chunk named there.
+
+| Part | Topic | Slides block |
+|------|-------|--------------|
+| 1 | RStudio Projects and R Markdown | III |
+| 2 | Git and GitHub setup | IV |
+| 3 | R as a calculator, objects, data types | V |
+| 4 | Student cities: vectors, factors, matrices, lists, data frames | V |
+| 5 | Packages and importing Compustat — with checks | V |
+| 6 | Coding with AI: bug hunt | VI |
+| 7 | Wrap-up | VII |
+
+Our organising question for the whole semester:
+
+> **How do I know that this analysis is correct and informative?**
+
+Run a chunk with the green ▶ button (or `Ctrl+Shift+Enter`), a single line with `Ctrl+Enter`. Knit the whole document with `Ctrl+Shift+K`.
+
+------------------------------------------------------------------------
+
+# Part 1 · RStudio Projects and R Markdown
+
+An **RStudio Project** is a folder with an `.Rproj` file. Opening the `.Rproj` file sets the working directory to that folder. All paths in our code are **relative** to the project root, so the code runs on every laptop.
+
+When you knit, R runs the document in the folder of the `.Rmd` file (`session_01/`). The **here** package always finds the project root (the folder containing the `.Rproj` file) — regardless of where the document lives.
+
+### Chunk 1.1 · Where am I?
+
+```{r chunk_1_1}
+## Where does R look for files right now?
+
+
+```
+
+### Chunk 1.2 · Relative paths with here()
+
+```{r chunk_1_2}
+## Install once (Console!): install.packages("here")
+## The project root
+## Build a path to the data folder — works on Windows, Mac and Linux
+## Does the file exist? (TRUE once you have copied the Moodle files into data/)
+
+
+```
+
+Compare this with an **absolute path** such as `"C:/Users/seitz/Documents/01_Lehre/compustat.csv"` — it only works on my laptop. Note also: R wants forward slashes `/` (or doubled backslashes `\\`) in paths.
+
+### Exercise 1.3 · Make the document yours
+
+1.  Replace the author in the YAML header at the very top with your name.
+2.  Knit the document (`Ctrl+Shift+K`). An HTML file appears next to the `.Rmd`.
+3.  Try the **Visual** editor (button top left of the editor) and switch back to **Source**.
+
+**Markdown reminder:** `# Heading`, `**bold**`, `*italic*`, `- bullet`, `[link](https://www.lmu.de)`, inline formula `$\beta_1$`, block formula `$$y = a + b x$$`.
+
+------------------------------------------------------------------------
+
+# Part 2 · Git and GitHub
+
+Git records snapshots (**commits**) of your project folder. GitHub stores these snapshots in the cloud. The daily loop is **pull → work → commit → push**.
+
+The chunks in this part are set to `eval = FALSE`: you run them **once**, line by line, in the **Console** — not every time you knit.
+
+### Chunk 2.1 · Is Git installed and does RStudio find it?
+
+```{r chunk_2_1, eval=FALSE}
+## Install the helper packages once
+install.packages(c("usethis", "gitcreds"))
+
+## Health report of your Git/GitHub setup
+usethis::git_sitrep()
+```
+
+If Git is missing: **Windows** — install from <https://git-scm.com> (defaults are fine). **Mac** — run `xcode-select --install` in the Terminal. Then check *Tools → Global Options → Git/SVN* and restart RStudio.
+
+### Chunk 2.2 · Tell Git who you are
+
+```{r chunk_2_2, eval=FALSE}
+## Use the e-mail address of your GitHub account
+usethis::use_git_config(user.name  = "Jane Doe",
+                        user.email = "jane.doe@campus.lmu.de")
+```
+
+### Chunk 2.3 · Give RStudio a key to GitHub (personal access token)
+
+```{r chunk_2_3, eval=FALSE}
+## Opens github.com in the browser with sensible defaults.
+## Set an expiry date (e.g., end of March 2027) and click "Generate token".
+usethis::create_github_token()
+
+## Paste the token when asked. Never put the token into a script or commit it!
+gitcreds::gitcreds_set()
+
+## Check again — everything should be fine now
+usethis::git_sitrep()
+```
+
+### Exercise 2.4 · Fork and clone the course repository
+
+On **github.com**:
+
+1.  Open the course repository (link on the room screen, in the Zoom chat and on Moodle).
+2.  Click **Fork → Create fork**. You now own a copy: `github.com/YOUR-NAME/EmpRes-Tutorial`.
+3.  In *your fork*, click the green **\<\> Code** button and copy the HTTPS URL.
+
+In **RStudio**:
+
+4.  *File → New Project → Version Control → Git*, paste the URL.
+5.  Choose a parent folder **outside** OneDrive/Dropbox/iCloud (cloud sync and Git do not get along).
+6.  *Create Project*. RStudio opens `EmpRes-Tutorial.Rproj`, the **Git** tab appears top right.
+7.  Copy `compustat.csv` and `compustat_German_format.csv` from Moodle into the `data/` folder. They will **not** be uploaded to GitHub (see `.gitignore`): Compustat is licensed data.
+
+**Getting my new material later:** on github.com open your fork → **Sync fork → Update branch**, then click **Pull** (blue arrow) in RStudio.
+
+### Exercise 2.5 · Your first commit and push
+
+1.  Put your name in the YAML header (Exercise 1.3), save, knit.
+2.  Git tab: tick `session_01/Session_01_student.Rmd` → **Commit**.
+3.  Message: `Add my name to tutorial 1` → **Commit** → close.
+4.  **Push** (green arrow).
+5.  Open your fork on github.com: is the commit there?
+
+*Question:* Why does the knitted `.html` file not appear in the Git tab? → Look into `.gitignore`.
+
+------------------------------------------------------------------------
+
+# Part 3 · R basics
+
+## R as a calculator
+
+Basic operations: `+ - * / ^`. Some functions:
+
+| Description          | R code     |
+|----------------------|------------|
+| Absolute value       | `abs(x)`   |
+| Square root          | `sqrt(x)`  |
+| Exponential function | `exp(x)`   |
+| Natural logarithm    | `log(x)`   |
+| Round to s digits    | `round(x, s)` |
+
+The assignment operator is the arrow `<-` (shortcut `Alt + -`). `=` also works but is not recommended. `#` starts a comment. R is **case-sensitive**.
+
+### Chunk 3.1 · Calculator and assignment
+
+```{r chunk_3_1}
+## Assign values to objects (no output)
+## Fun with floating point: Euler's identity e^(i*pi) + 1 = 0
+## Lesson: never test numbers with == after calculations, use all.equal()
+
+
+```
+
+## Objects and data types
+
+R works with objects: numbers, text, vectors, matrices, data frames, functions, results … The main data types are **numeric**, **character** (text), **logical** (TRUE/FALSE) and **integer**. `class()` tells you the type, `as.numeric()`, `as.character()` etc. convert. The decimal separator is a **point**. `rm()` deletes an object.
+
+### Chunk 3.2 · Data types
+
+```{r chunk_3_2}
+## Conversion
+## Delete an object
+
+
+```
+
+### Chunk 3.3 · Logical operators
+
+| Description              | R code   |
+|--------------------------|----------|
+| Equal to                 | `x == y` |
+| Less than                | `x < y`  |
+| Greater than or equal to | `x >= y` |
+| Not equal to             | `x != y` |
+| Not                      | `!b`     |
+| Or                       | `a | b`  |
+| And                      | `a & b`  |
+
+```{r chunk_3_3}
+
+
+```
+
+------------------------------------------------------------------------
+
+# Part 4 · Our student cities
+
+This is where you study:
+
+| Students | University | City |
+|---------:|-------------------------------|------------|
+| 8 | LMU Munich | Munich |
+| 1 | Aalto University | Espoo |
+| 1 | Stockholm School of Economics | Stockholm |
+| 1 | University of Mannheim | Mannheim |
+| 1 | University of Eastern Finland | Joensuu |
+| +1 | exchange / second city | Vienna |
+| +1 | exchange / second city | Shanghai |
+
+And this is what we know about the cities:
+
+| City | Country | Inhabitants (approx.) | At the sea? | Party drink | Alcohol-free |
+|-----------|---------|-----------:|-----|------------------|--------------|
+| Munich    | Germany | 1,510,000  | no  | Helles beer      | Spezi        |
+| Espoo     | Finland | 320,000    | yes | Lonkero          | Jaffa        |
+| Stockholm | Sweden  | 990,000    | yes | Akvavit          | Julmust      |
+| Mannheim  | Germany | 315,000    | no  | Riesling Schorle | Apfelschorle |
+| Joensuu   | Finland | 78,000     | no  | Koskenkorva      | Kotikalja    |
+| Vienna    | Austria | 2,000,000  | no  | Spritzer         | Almdudler    |
+| Shanghai  | China   | 24,900,000 | yes | Huangjiu         | Suanmeitang  |
+
+*Note:* The population numbers below were drafted with the help of AI and rounded. Are they right? That is Task A2.
+
+## Vectors
+
+The simplest way to collect many values is a **vector**: `c(value1, value2, ...)`. A vector has **exactly one data type**.
+
+| Description                      | R code             |
+|----------------------------------|--------------------|
+| Number of elements               | `length(x)`        |
+| Largest / smallest value         | `max(x)`, `min(x)` |
+| Sort                             | `sort(x)`          |
+| Sum / product / mean             | `sum(x)`, `prod(x)`, `mean(x)` |
+| n copies of z                    | `rep(z, n)`        |
+| Sequence from f to t (step s)    | `seq(f, t, s)` or `f:t` |
+
+### Chunk 4.1 · Create vectors
+
+```{r chunk_4_1}
+## Give the elements names
+## Vector functions
+## Special vectors
+## Calculations work element by element
+
+
+```
+
+### Chunk 4.2 · Indexing
+
+```{r chunk_4_2}
+
+
+```
+
+**Task A1:** Which of "your" cities have more than 1 million inhabitants? How many are they?
+
+```{r task_A1}
+
+
+```
+
+**Task A2 (verification):** Look up the population of *one* city in an official source (e.g., the statistical office of the country). Is our rounded number close enough? What exactly is counted — city proper or metropolitan area?
+
+
+## Factors
+
+A **factor** maps labels to an underlying integer code. Factors are useful for categories such as countries, industries or audit firms.
+
+### Chunk 4.3 · Factors
+
+```{r chunk_4_3}
+
+
+```
+
+## Matrices — and the matrix trap
+
+`cbind()` combines vectors column-wise, `rbind()` row-wise. Like a vector, a **matrix has exactly one data type**.
+
+### Chunk 4.4 · Matrices
+
+```{r chunk_4_4}
+## Add a text column: is the city at the sea?
+## Add a row
+## Indexing: first row, then column
+
+
+```
+
+**Task B:** Run `sum(m2[, "inhabitants"])`. What happens and why? How could you have noticed **before** the error?
+
+```{r task_B, error=TRUE}
+
+
+```
+
+## Lists
+
+A **list** is a bag that can hold any objects of any length and type.
+
+### Chunk 4.5 · Lists
+
+```{r chunk_4_5}
+
+
+```
+
+## Data frames
+
+A **data frame** is the most important object for data analysis: a rectangle with **columns = variables** and **rows = observations**. Each column has one type, but different columns can have different types. **Tidy data:** every column a variable, every row an observation, every cell a single value.
+
+Useful functions: `data.frame()`, `head()`, `str()`, `nrow()`, `ncol()`, `summary()`, `subset()`, `df$column`.
+
+### Chunk 4.6 · Data frames
+
+```{r chunk_4_6}
+## One row per city
+
+
+```
+
+The student data are given — run this chunk:
+
+```{r students_data}
+## One row per student (given, anonymous IDs, home university)
+students <- data.frame(
+  student_id = sprintf("S%02d", 1:12),
+  university = c("LMU", "LMU", "LMU", "LMU", "LMU", "LMU", "LMU", "LMU",
+                 "Aalto", "SSE", "Mannheim", "UEF"),
+  city       = c("Munich", "Munich", "Munich", "Munich", "Munich", "Munich",
+                 "Munich", "Munich", "Espoo", "Stockholm", "Mannheim", "Joensuu")
+)
+```
+
+```{r chunk_4_6b}
+## Explore the students data
+
+
+```
+
+**Task C · Party planning:** Every student brings the drink of their (home) city. How many bottles of each drink do we need? Check your result against what you know about the class.
+
+```{r task_C}
+## Look up each student's drink in df_cities (a first "merge" — more in Tutorial 2)
+## Check with what we know: 8 LMU students -> 8 x Helles beer
+## Alternative with the same answer (independent implementation)
+
+
+```
+
+------------------------------------------------------------------------
+
+# Part 5 · Packages and importing Compustat
+
+**Packages** are collections of functions. Install once per laptop with `install.packages("name")` (or *Tools → Install Packages*), load in every session with `library(name)`. Load all packages at the top of a document. If two packages have functions with the same name, write `package::function()`.
+
+The **tidyverse** is a collection of packages for data analysis: `readr` (import), `dplyr` (manipulation), `ggplot2` (graphics), `tidyr`, `tibble` …
+
+### Chunk 5.1 · Load packages
+
+```{r chunk_5_1}
+## install.packages("tidyverse")   # once per laptop, in the Console
+
+
+```
+
+Our data: **Compustat North America**, all public U.S. and Canadian firms, fiscal years 2010–2014 — downloaded from WRDS. Licensed data: it stays in `data/`, it is not pushed to GitHub, and it is not pasted into public AI tools.
+
+| File | Separator | Decimal | Function |
+|------|-----------|---------|----------|
+| `compustat.csv` | `,` | `.` | `read_csv()` (readr) or `read.csv()` (base R) |
+| `compustat_German_format.csv` | `;` | `,` | `read_csv2()` or `read.csv2()` |
+
+### Chunk 5.2 · Import the same data three ways
+
+```{r chunk_5_2}
+
+
+```
+
+### Chunk 5.3 · Same file, same data? Compare!
+
+```{r chunk_5_3}
+## 1. The identifier gvkey
+## 2. Type guessing: readr guesses column types from the first 1,000 rows
+## 3. A safer import: tell R the types instead of letting it guess
+## 4. Do the numbers agree across the imports?
+
+
+```
+
+**Your conclusion:** what differs between the three imports — and which one would you trust? Why?
+
+
+### Chunk 5.4 · Five checks after every import
+
+```{r chunk_5_4}
+## 1. Size
+## 2. Types
+## 3. Keys: one row per firm-year?
+## 4. Ranges and missing values
+## 5. Known value: Apple's total assets, fiscal year 2014 (in USD millions)
+
+
+```
+
+**Task D:** Write at least three assertions with `stopifnot()` that must hold for our data. If one fails, the knit stops — that is the point.
+
+```{r task_D}
+
+
+```
+
+*Teaser for Tutorial 2:* compare `nrow(cs)` with `n_distinct(cs$gvkey, cs$fyear)`. What do you see — and why? (Hint: `indfmt`.)
+
+
+### Chunk 5.5 · Export and clean up
+
+```{r chunk_5_5}
+## Export: always to output/, never overwrite raw data in data/
+## Remove objects we no longer need
+## Remove everything (same as the broom icon in the Environment pane)
+## rm(list = ls())
+
+
+```
+
+------------------------------------------------------------------------
+
+# Part 6 · Coding with AI: bug hunt
+
+The script below was "written by an AI" for the prompt *"Summarise our student cities and the Compustat data."* It looks plausible. Some lines run without any error — and are still wrong.
+
+**Round 1 (10 min, by hand):** Run the chunk. Mark every bug with a comment `# BUG:` and a reason. Use what you know about our cities.
+**Round 2 (10 min, with AI):** Ask the **Posit Assistant** in RStudio: *"Review the code in chunk 6.1 for bugs. For each bug, explain why it is a bug and how to fix it. Do not change the code."* Remember: it can see your session, including the loaded Compustat data. Compare with your list.
+**Round 3 (5 min):** Which bugs did the AI find that you missed? Which did it miss? Did it invent a bug? What does that mean for how you use AI?
+
+### Chunk 6.1 · The AI-generated script
+
+```{r chunk_6_1, error=TRUE}
+## ---- AI-generated script: summary of student cities and Compustat ----
+
+## (a) Number of students per city, added to the city table
+n_per_city <- table(students$city)
+city_info <- df_cities
+city_info$n_students <- c(as.numeric(n_per_city), 0, 0)
+city_info[, c("city", "n_students")]
+
+## (b) Population in millions
+city_info$inhabitants_m <- city_info$inhabitants / 1e5
+city_info[, c("city", "inhabitants_m")]
+
+## (c) German cities only
+german <- subset(city_info, country = "Germany")
+nrow(german)
+
+## (d) Average sales of Compustat firms
+avg_sales <- mean(cs$sale, na.rm = TRUE)
+cat("Average sales in thousand USD:", round(avg_sales), "\n")
+
+## (e) Number of firms in the sample
+n_firms <- nrow(cs)
+cat("Number of firms:", n_firms, "\n")
+
+## (f) Median total assets by fiscal year
+summarise_median(cs, at, by = fyear)
+```
+
+### Chunk 6.2 · Solution: bugs, fixes and checks
+
+Write your corrected version below. For every fix, add an assertion (`stopifnot()`) that checks the result against something you know.
+
+
+```{r chunk_6_2}
+## (a) match by name, not by position — and check with known values
+## (b) millions — check: Munich must be about 1.5
+## (c) comparison with == ; check: we know there are exactly two German cities
+## (d) units and currency: Compustat items are in millions of the reporting currency
+## (e) firms vs. firm-years
+## (f) an existing function — and an independent implementation as check
+
+
+```
+
+
+------------------------------------------------------------------------
+
+# Part 7 · Wrap-up
+
+**Checklist — can you do this now?**
+
+-   [ ] Open the course project via the `.Rproj` file and knit this document
+-   [ ] Use relative paths with `here()`
+-   [ ] `usethis::git_sitrep()` shows no problems
+-   [ ] Fork, clone, commit and push work
+-   [ ] Create vectors, factors, matrices, lists, data frames — and check their types
+-   [ ] Import a CSV and run the five checks plus assertions
+-   [ ] Use the Posit Assistant to draft and review code — and verify what you use
+
+**Before Tutorial 2 (Thu 29 Oct):** commit and push your completed version of this document.
+
+```{r session_info}
+## Which R and package versions produced this document? (part of reproducibility)
+sessionInfo()
+```

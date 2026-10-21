@@ -1,0 +1,27 @@
+# --- RStudio / R ---------------------------------------------------------
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*_cache/
+*_files/
+
+# --- Data: licensed (Compustat/WRDS) -> comes from Moodle, never GitHub ---
+data/*
+!data/README.md
+
+# --- Everything the code creates ----------------------------------------
+output/*
+!output/.gitkeep
+*.html
+
+# --- Instructor material (solutions) never goes to the public repo ------
+_instructor_only/
+
+# --- Secrets --------------------------------------------------------------
+.Renviron
+*.token
+.Rproj.user
+.httr-oauth
+.DS_Store
+.quarto
