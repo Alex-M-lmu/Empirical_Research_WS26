@@ -200,7 +200,9 @@ R works with objects: numbers, text, vectors, matrices, data frames, functions, 
 
 # Part 4 · Our student cities
 
-This is where you study:
+**Welcome to our running example: you!**
+
+Before we work with real accounting data, we practise with data we all know: the universities and cities where you study. Because you know these data, you will notice immediately when your code produces something wrong.
 
 | Students | University | City |
 |---------:|-------------------------------|------------|
