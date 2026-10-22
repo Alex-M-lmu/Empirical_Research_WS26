@@ -25,3 +25,4 @@ _instructor_only/
 .httr-oauth
 .DS_Store
 .quarto
+.posit/assistant
