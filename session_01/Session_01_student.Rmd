@@ -28,9 +28,7 @@ This R Markdown belongs to the slides of **Tutorial 1**. Whenever a slide shows 
 | 6 | Coding with AI: bug hunt | VI |
 | 7 | Wrap-up | VII |
 
-Our organising question for the whole semester:
-
-> **How do I know that this analysis is correct and informative?**
+> **In this tutorial you conduct empirical accounting research yourself** — from raw data to your own code to your own evidence. Today we build the toolbox: an R project, R Markdown, Git/GitHub and careful AI-assisted coding.
 
 Run a chunk with the green ▶ button (or `Ctrl+Shift+Enter`), a single line with `Ctrl+Enter`. Knit the whole document with `Ctrl+Shift+K`.
 
@@ -349,7 +347,7 @@ students <- data.frame(
 
 ```{r task_C}
 ## Look up each student's drink in df_cities (a first "merge" — more in Tutorial 2)
-## Check with what we know: 8 LMU students -> 8 x Helles beer
+## Check with what we know: 8 LMU students -> should be 8 x Helles beer
 ## Alternative with the same answer (independent implementation)
 
 
@@ -411,12 +409,14 @@ Our data: **Compustat North America**, all public U.S. and Canadian firms, fisca
 
 ```
 
-**Task D:** Write at least three assertions with `stopifnot()` that must hold for our data. If one fails, the knit stops — that is the point.
+**Task D:** Run the five checks above. What surprises you? Note two or three observations as text below the chunk.
 
 ```{r task_D}
+## Your extra checks
 
 
 ```
+
 
 *Teaser for Tutorial 2:* compare `nrow(cs)` with `n_distinct(cs$gvkey, cs$fyear)`. What do you see — and why? (Hint: `indfmt`.)
 
@@ -439,7 +439,7 @@ Our data: **Compustat North America**, all public U.S. and Canadian firms, fisca
 The script below was "written by an AI" for the prompt *"Summarise our student cities and the Compustat data."* It looks plausible. Some lines run without any error — and are still wrong.
 
 **Round 1 (10 min, by hand):** Run the chunk. Mark every bug with a comment `# BUG:` and a reason. Use what you know about our cities.
-**Round 2 (10 min, with AI):** Ask the **Posit Assistant** in RStudio: *"Review the code in chunk 6.1 for bugs. For each bug, explain why it is a bug and how to fix it. Do not change the code."* Remember: it can see your session, including the loaded Compustat data. Compare with your list.
+**Round 2 (10 min, with AI):** Give the script of chunk 6.1 to an AI tool of your choice (for example the Posit Assistant in RStudio or a chat assistant in the browser) — the code only, **never the Compustat data**: *"Review this R code for bugs. For each bug, explain why it is a bug and how to fix it."* Compare with your list.
 **Round 3 (5 min):** Which bugs did the AI find that you missed? Which did it miss? Did it invent a bug? What does that mean for how you use AI?
 
 ### Chunk 6.1 · The AI-generated script
@@ -475,7 +475,7 @@ summarise_median(cs, at, by = fyear)
 
 ### Chunk 6.2 · Solution: bugs, fixes and checks
 
-Write your corrected version below. For every fix, add an assertion (`stopifnot()`) that checks the result against something you know.
+Write your corrected version below. After every fix, check the result against something you know (e.g., Munich has 8 students).
 
 
 ```{r chunk_6_2}
@@ -501,8 +501,8 @@ Write your corrected version below. For every fix, add an assertion (`stopifnot(
 -   [ ] `usethis::git_sitrep()` shows no problems
 -   [ ] Fork, clone, commit and push work
 -   [ ] Create vectors, factors, matrices, lists, data frames — and check their types
--   [ ] Import a CSV and run the five checks plus assertions
--   [ ] Use the Posit Assistant to draft and review code — and verify what you use
+-   [ ] Import a CSV and run the five checks
+-   [ ] Use AI to draft and review code — and check what you use
 
 **Before Tutorial 2 (Thu 29 Oct):** commit and push your completed version of this document.
 
