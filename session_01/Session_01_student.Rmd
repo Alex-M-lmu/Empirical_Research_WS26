@@ -1,7 +1,7 @@
 ---
 title: "Tutorial 1 · Reproducible Research Workflow"
 subtitle: "Empirical Research in Accounting, Auditing and Capital Markets · WS 2026/27"
-author: "Your Name"
+author: "Alexandra M"
 date: "22 October 2026"
 output:
   html_document:
