@@ -1,17 +1,16 @@
 ---
-# ===== YAML header: settings for the document =====
-# Knitting (Ctrl + Shift + K) = run all chunks and build a finished HTML document from them.
-# When knitting, this header is read and applied, not printed as text.
-
-title: "Tutorial 1 · Reproducible Research Workflow"   # große Überschrift oben
-subtitle: "Empirical Research in Accounting, Auditing and Capital Markets · WS 2026/27"   # Untertitel
-author: "Alexandra Malyschewa"   # mein Name
-date: "22 October 2026"          # Datum
-output:                          # Ausgabeformat beim Knitten
-  html_document:                 # HTML-Seite (öffnet im Browser)
-    toc: true                    # Inhaltsverzeichnis erstellen
-    toc_float: true              # Inhaltsverzeichnis bleibt beim Scrollen sichtbar
-    toc_depth: 3                 # Überschriften bis Ebene 3 aufnehmen
+title: "Tutorial 1 · Reproducible Research Workflow"
+subtitle: "Empirical Research in Accounting, Auditing and Capital Markets · WS 2026/27"
+author: "Jan Seitz"
+date: "22 October 2026"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 A code chunk starts with `{r} and ends with`. Only the code in between is run as R. Outside a chunk, everything is normal text and is never executed. Inside a chunk, comments start with #.
@@ -28,10 +27,11 @@ knitr::opts_chunk$set(echo = TRUE, comment = "", message = FALSE, warning = FALS
 
 # How to use this document
 
-This R Markdown belongs to the slides of **Tutorial 1**. Whenever a slide shows the blue **▶ IN RSTUDIO** bar, switch to this document and work on the part and chunk named there.
+This R Markdown belongs to the slides of **Tutorial 1**.
+Whenever a slide shows the blue **▶ IN RSTUDIO** bar, switch to this document and work on the part and chunk named there.
 
 | Part | Topic | Slides block |
-|------------------|------------------|------------------------------------|
+|------------------------|------------------------|------------------------|
 | 1 | RStudio Projects and R Markdown | III |
 | 2 | Git and GitHub setup | IV |
 | 3 | R as a calculator, objects, data types | V |
@@ -40,23 +40,30 @@ This R Markdown belongs to the slides of **Tutorial 1**. Whenever a slide shows 
 | 6 | Coding with AI: bug hunt | VI |
 | 7 | Wrap-up | VII |
 
-> **In this tutorial you conduct empirical accounting research yourself** — from raw data to your own code to your own evidence. Today we build the toolbox: an R project, R Markdown, Git/GitHub and careful AI-assisted coding.
+> **In this tutorial you conduct empirical accounting research yourself** — from raw data to your own code to your own evidence.
+> Today we build the toolbox: an R project, R Markdown, Git/GitHub and careful AI-assisted coding.
 
-Run a chunk with the green ▶ button (or `Ctrl+Shift+Enter`), a single line with `Ctrl+Enter`. Knit the whole document with `Ctrl+Shift+K`.
+Run a chunk with the green ▶ button (or `Ctrl+Shift+Enter`), a single line with `Ctrl+Enter`.
+Knit the whole document with `Ctrl+Shift+K`.
 
 ------------------------------------------------------------------------
 
 # Part 1 · RStudio Projects and R Markdown
 
-An **RStudio Project** is a folder with an `.Rproj` file. Opening the `.Rproj` file sets the working directory to that folder. All paths in our code are **relative** to the project root, so the code runs on every laptop.
+An **RStudio Project** is a folder with an `.Rproj` file.
+Opening the `.Rproj` file sets the working directory to that folder.
+All paths in our code are **relative** to the project root, so the code runs on every laptop.
 
-When you knit, R runs the document in the folder of the `.Rmd` file (`session_01/`). The **here** package always finds the project root (the folder containing the `.Rproj` file) — regardless of where the document lives.
+When you knit, R runs the document in the folder of the `.Rmd` file (`session_01/`).
+The **here** package always finds the project root (the folder containing the `.Rproj` file) — regardless of where the document lives.
 
 ### Chunk 1.1 · Where am I?
 
 ```{r chunk_1_1}
 ## Where does R look for files right now?
+
 getwd()
+
 ```
 
 ### Chunk 1.2 · Relative paths with here()
@@ -64,20 +71,22 @@ getwd()
 ```{r chunk_1_2}
 ## Install once (Console!): install.packages("here")
 
-## Load the package (needed in every session)
 library(here)
 
 ## The project root
 here()
 
 ## Build a path to the data folder — works on Windows, Mac and Linux
-here("data", "compustat.csv")
+here("data","compustat.csv")
 
 ## Does the file exist? (TRUE once you have copied the Moodle files into data/)
-file.exists(here("data", "compustat.csv"))
+file.exists(here("data","compustat.csv"))
+
+
 ```
 
-Compare this with an **absolute path** such as `"C:/Users/seitz/Documents/01_Lehre/compustat.csv"` — it only works on my laptop. Note also: R wants forward slashes `/` (or doubled backslashes `\\`) in paths.
+Compare this with an **absolute path** such as `"C:/Users/seitz/Documents/01_Lehre/compustat.csv"` — it only works on my laptop.
+Note also: R wants forward slashes `/` (or doubled backslashes `\\`) in paths.
 
 ### Exercise 1.3 · Make the document yours
 
@@ -94,34 +103,32 @@ Knitting creates a separate HTML file (Session_01_student.html, next to your .Rm
 
 # Part 2 · Git and GitHub
 
-Git = program on your laptop that saves snapshots (commits) of your project folder, so you have a full history instead of many file copies.
-GitHub = website that stores your project and its history online (backup + sharing).
-Why in this course: to get the course material from Dr. Seitz, save your work with a history, and hand it in.
-Pull = download newest version from GitHub.
-Work = edit your files.
-Commit = save a snapshot on your laptop.
-Push = upload your snapshots to GitHub.
-eval = FALSE = these chunks don’t run when knitting; you run them once yourself in the Console (one-time setup).
+Git records snapshots (**commits**) of your project folder.
+GitHub stores these snapshots in the cloud.
+The daily loop is **pull → work → commit → push**.
+
+The chunks in this part are set to `eval = FALSE`: you run them **once**, line by line, in the **Console** — not every time you knit.
 
 ### Chunk 2.1 · Is Git installed and does RStudio find it?
 
 ```{r chunk_2_1, eval=FALSE}
-## Install the helper packages once: When installing packages, write into console
-install.packages(c("usethis", "gitcreds"))
+## Install the helper packages once
+#install.packages(c("usethis", "gitcreds"))
 
 ## Health report of your Git/GitHub setup
-usethis::git_sitrep()
-##Very good news: this is a healthy report. You must have set this up before, because almost everything is already done:
+#usethis::git_sitrep()
 ```
 
-If Git is missing: **Windows** — install from <https://git-scm.com> (defaults are fine). **Mac** — run `xcode-select --install` in the Terminal. Then check *Tools → Global Options → Git/SVN* and restart RStudio.
+If Git is missing: **Windows** — install from <https://git-scm.com> (defaults are fine).
+**Mac** — run `xcode-select --install` in the Terminal.
+Then check *Tools → Global Options → Git/SVN* and restart RStudio.
 
 ### Chunk 2.2 · Tell Git who you are
 
 ```{r chunk_2_2, eval=FALSE}
 ## Use the e-mail address of your GitHub account
-usethis::use_git_config(user.name  = "Jane Doe",
-                        user.email = "jane.doe@campus.lmu.de")
+#usethis::use_git_config(user.name  = "Jan Seitz",
+#                        user.email = "jan.seitz@lmu.de")
 ```
 
 ### Chunk 2.3 · Give RStudio a key to GitHub (personal access token)
@@ -129,13 +136,13 @@ usethis::use_git_config(user.name  = "Jane Doe",
 ```{r chunk_2_3, eval=FALSE}
 ## Opens github.com in the browser with sensible defaults.
 ## Set an expiry date (e.g., end of March 2027) and click "Generate token".
-usethis::create_github_token()
+#usethis::create_github_token()
 
 ## Paste the token when asked. Never put the token into a script or commit it!
-gitcreds::gitcreds_set()
+#gitcreds::gitcreds_set()
 
 ## Check again — everything should be fine now
-usethis::git_sitrep()
+#usethis::git_sitrep()
 ```
 
 ### Exercise 2.4 · Fork and clone the course repository
@@ -174,7 +181,8 @@ In **RStudio**:
 4.  **Push** (green arrow).
 5.  Open your fork on github.com: is the commit there?
 
-*Question:* Why does the knitted `.html` file not appear in the Git tab? → Look into `.gitignore`.
+*Question:* Why does the knitted `.html` file not appear in the Git tab?
+→ Look into `.gitignore`.
 
 ------------------------------------------------------------------------
 
@@ -182,7 +190,8 @@ In **RStudio**:
 
 ## R as a calculator
 
-Basic operations: `+ - * / ^`. Some functions:
+Basic operations: `+ - * / ^`.
+Some functions:
 
 | Description          | R code        |
 |----------------------|---------------|
@@ -192,51 +201,70 @@ Basic operations: `+ - * / ^`. Some functions:
 | Natural logarithm    | `log(x)`      |
 | Round to s digits    | `round(x, s)` |
 
-The assignment operator is the arrow `<-` (shortcut `Alt + -`). `=` also works but is not recommended. `#` starts a comment. R is **case-sensitive**.
+The assignment operator is the arrow `<-` (shortcut `Alt + -`).
+`=` also works but is not recommended.
+`#` starts a comment.
+R is **case-sensitive**.
 
 ### Chunk 3.1 · Calculator and assignment
 
 ```{r chunk_3_1}
-## Assign values to objects (no output)
-1 + 1
-5 * (4 - 1)^2
-sqrt(log(10))      # functions can be nested: first log(10), then the square root
 
-## Fun with floating point: Euler's identity e^(i*pi) + 1 = 0
+1+1
+5*(4-1)^2
+sqrt(log(10))
 ## Assign values to objects (no output)
-x <- 5             # "x gets 5": stored in memory, appears in the Environment pane
-X <- 6             # different object! R is case-sensitive (x ≠ X)
-x^2                # use the object in a calculation
+x <- 5
+X <- 6
 
+x
+x^2
+y <- 3
+
+(z <- y^x)
+
+## Fun with floating point: Euler's identity 
+## e^(i*pi) + 1 = 0
+
+i <- complex(real = 0, imaginary = 1)
+exp(pi * i) +1
+
+round(exp(pi * i) + 1, 10)
 ## Lesson: never test numbers with == after calculations, use all.equal()
-## Fun with floating point: Euler's identity e^(i*pi) + 1 = 0
-exp(1i * pi) + 1   # should be exactly 0, but R shows a tiny rounding error (~1e-16)
-0.1 + 0.2 == 0.3   # FALSE! Same problem: computers store decimals only approximately
+
+0.1 + 0.2 == 0.3
+
+isTRUE(all.equal(0.1 + 0.2, 0.3))
 
 ```
 
 ## Objects and data types
 
-R works with objects: numbers, text, vectors, matrices, data frames, functions, results … The main data types are **numeric**, **character** (text), **logical** (TRUE/FALSE) and **integer**. `class()` tells you the type, `as.numeric()`, `as.character()` etc. convert. The decimal separator is a **point**. `rm()` deletes an object.
+R works with objects: numbers, text, vectors, matrices, data frames, functions, results … The main data types are **numeric**, **character** (text), **logical** (TRUE/FALSE) and **integer**.
+`class()` tells you the type, `as.numeric()`, `as.character()` etc. convert.
+The decimal separator is a **point**.
+`rm()` deletes an object.
 
 ### Chunk 3.2 · Data types
 
 ```{r chunk_3_2}
-## Data types: class() tells you what type an object is
-class(42)          # "numeric"   = number
-class("Munich")    # "character" = text (always in quotes)
-class(TRUE)        # "logical"   = TRUE / FALSE
-class(42L)         # "integer"   = whole number (the L makes it integer)
+number <- 42
+text <- "Ultimate Question of Life, the Universe, and Everything"
+logic <- TRUE
+integer <- 42L
+
+class(number)
+class(text)
 
 ## Conversion
-as.character(42)   # number -> text: "42"
-as.numeric("42")   # text -> number: 42
-as.numeric("Munich")   # text that isn't a number -> NA (= missing value)
-as.numeric("001004")   # -> 1004: leading zeros are lost!
+as.numeric(integer)
 
+as.integer(42.56)
+as.numeric("42.56")
+
+as.numeric("42,56")
 ## Delete an object
-y <- 10            # create an object (appears in the Environment)
-rm(y)              # delete it (disappears from the Environment)
+rm(text)
 
 ```
 
@@ -253,27 +281,16 @@ rm(y)              # delete it (disappears from the Environment)
 | And                      | `a & b`  |
 
 ```{r chunk_3_3}
-## Logical operators: every comparison returns TRUE or FALSE
-x <- 5
-y <- 3
+munich <- 1510000
+espoo <- 320000
 
-x == y        # equal to?                 FALSE
-x < y         # less than?                FALSE
-x >= y        # greater than or equal?    TRUE
-x != y        # not equal?                TRUE
+munich > espoo
 
-## Combine conditions
-a <- x > 4    # TRUE
-b <- y > 4    # FALSE
+munich == espoo
+munich != espoo
 
-!b            # not:  turns FALSE into TRUE
-a | b         # or:   TRUE if at least one is TRUE  -> TRUE
-a & b         # and:  TRUE only if both are TRUE    -> FALSE
-
-## Common mistake: = assigns, == compares
-x == 3        # asks "is x 3?"  -> FALSE
-
-
+(munich > 1e6) & (espoo > 1e6)
+(munich > 1e6) | (espoo > 1e6)
 ```
 
 ------------------------------------------------------------------------
@@ -282,7 +299,8 @@ x == 3        # asks "is x 3?"  -> FALSE
 
 **Welcome to our running example: you!**
 
-Before we work with real accounting data, we practise with data we all know: the universities and cities where you study. Because you know these data, you will notice immediately when your code produces something wrong.
+Before we work with real accounting data, we practise with data we all know: the universities and cities where you study.
+Because you know these data, you will notice immediately when your code produces something wrong.
 
 | Students | University                    | City      |
 |---------:|-------------------------------|-----------|
@@ -297,7 +315,7 @@ Before we work with real accounting data, we practise with data we all know: the
 And this is what we know about the cities:
 
 | City | Country | Inhabitants (approx.) | At the sea? | Party drink | Alcohol-free |
-|------------|------------|-----------:|------------|-------------|------------|
+|------------|------------|-----------:|------------|------------|------------|
 | Munich | Germany | 1,510,000 | no | Helles beer | Spezi |
 | Espoo | Finland | 320,000 | yes | Lonkero | Jaffa |
 | Stockholm | Sweden | 990,000 | yes | Akvavit | Julmust |
@@ -306,11 +324,14 @@ And this is what we know about the cities:
 | Vienna | Austria | 2,000,000 | no | Spritzer | Almdudler |
 | Shanghai | China | 24,900,000 | yes | Huangjiu | Suanmeitang |
 
-*Note:* The population numbers below were drafted with the help of AI and rounded. Are they right? That is Task A2.
+*Note:* The population numbers below were drafted with the help of AI and rounded.
+Are they right?
+That is Task A2.
 
 ## Vectors
 
-The simplest way to collect many values is a **vector**: `c(value1, value2, ...)`. A vector has **exactly one data type**.
+The simplest way to collect many values is a **vector**: `c(value1, value2, ...)`.
+A vector has **exactly one data type**.
 
 | Description                   | R code                         |
 |-------------------------------|--------------------------------|
@@ -324,55 +345,54 @@ The simplest way to collect many values is a **vector**: `c(value1, value2, ...)
 ### Chunk 4.1 · Create vectors
 
 ```{r chunk_4_1}
-## Create vectors: c() = "combine" several values into one vector
-cities <- c("Munich", "Espoo", "Stockholm",
-            "Mannheim", "Joensuu", "Vienna", "Shanghai")
-inhabitants <- c(1510000, 320000, 990000,
-                 315000, 78000, 2000000, 24900000)
+
+cities <- c("Munich", "Espoo", "Stockholm","Mannheim","Joensuu","Vienna","Shanghai")
+
+inhabitants <- c(1510000,320000,990000,315000,78000,2000000,24900000)
+
+
 
 ## Give the elements names
-names(inhabitants) <- cities   # each number gets its city as a label
+names(inhabitants) <- cities
 inhabitants
 
 ## Vector functions
-length(cities)          # number of elements: 7
-sum(inhabitants)        # total inhabitants
-mean(inhabitants)       # average
-max(inhabitants)        # largest value
-min(inhabitants)        # smallest value
-sort(inhabitants)       # sorted from small to large
+length(cities)
+sum(inhabitants)/1e6 #in millions
 
+mean(inhabitants)
+median(inhabitants)
+
+sort(inhabitants, decreasing = TRUE)
 ## Special vectors
-1:10                    # sequence 1, 2, ..., 10
-seq(1, 10, 2)           # from 1 to 10 in steps of 2: 1 3 5 7 9
-rep("beer", 3)          # "beer" three times
+rep("beer",3)
+seq(2010,2014)
+
 
 ## Calculations work element by element
-inhabitants / 1e6       # every city in millions (1e6 = 1,000,000)
-sum(inhabitants) / 1e6  # total in millions
+inhabitants/1e6
+
+
 ```
+
+\
 
 ### Chunk 4.2 · Indexing
 
 ```{r chunk_4_2}
 ## Indexing = picking elements out of a vector with [ ]
 
-## By position (R starts counting at 1, not 0)
-cities[1]                  # first element: "Munich"
-cities[c(2, 3)]            # second and third element
-cities[-1]                 # all EXCEPT the first
-
-## By name (works because we gave inhabitants names)
+inhabitants[2] # by position
+inhabitants[2:4]
 inhabitants["Vienna"]
-inhabitants[c("Munich", "Mannheim")]
-
-## By condition: TRUE/FALSE for each element, keep the TRUE ones
-inhabitants > 1e6                  # check: which cities have more than 1 million?
-inhabitants[inhabitants > 1e6]     # keep only those
+inhabitants[c("Munich","Shanghai")]
+inhabitants[-1]
+inhabitants[inhabitants < 500000]
 
 ```
 
-**Task A1:** Which of "your" cities have more than 1 million inhabitants? How many are they?
+**Task A1:** Which of "your" cities have more than 1 million inhabitants?
+How many are they?
 
 ```{r task_A1}
 ## Which cities have more than 1 million inhabitants?
@@ -387,49 +407,43 @@ sum(inhabitants > 1e6)                  # alternative: TRUE counts as 1, FALSE a
 
 ```
 
-**Task A2 (verification):** Look up the population of *one* city in an official source (e.g., the statistical office of the country). Is our rounded number close enough? What exactly is counted — city proper or metropolitan area?
-- Our number (1,510,000) matches the official state/federal figure for the city proper (about 1.51 million, 2024).
-- The city's own statistical office reports more, because it counts from the residents' register instead of the census.
-- Lesson: a plausible number isn't enough, always check what is measured and by whom.
-  
+**Task A2 (verification):** Look up the population of *one* city in an official source (e.g., the statistical office of the country).
+Is our rounded number close enough?
+What exactly is counted — city proper or metropolitan area?
+
 ## Factors
 
-A **factor** maps labels to an underlying integer code. Factors are useful for categories such as countries, industries or audit firms.
+A **factor** maps labels to an underlying integer code.
+Factors are useful for categories such as countries, industries or audit firms.
 
 ### Chunk 4.3 · Factors
 
 ```{r chunk_4_3}
-## Factor = category variable: labels stored with an integer code behind them
-country <- factor(c("Germany", "Finland", "Sweden",
-                    "Germany", "Finland", "Austria", "China"))
+country <- factor(c("Germany","Finland","Sweden","Germany","Finland","Austria","China"))
+
 country
-
-## The categories (levels), sorted alphabetically
-levels(country)
-
-## How often does each category occur?
-table(country)
-
-## Behind the scenes: each label is a number (its position in levels)
-as.integer(country)
 
 ```
 
 ## Matrices — and the matrix trap
 
-`cbind()` combines vectors column-wise, `rbind()` row-wise. Like a vector, a **matrix has exactly one data type**.
+`cbind()` combines vectors column-wise, `rbind()` row-wise.
+Like a vector, a **matrix has exactly one data type**.
 
 ### Chunk 4.4 · Matrices
 
 ```{r chunk_4_4}
-## Create a matrix: cbind() puts vectors side by side as columns
-m <- cbind(inhabitants, students = c(8, 1, 1, 1, 1, 1, 1))
-m                              # rows = cities (from the names), columns = inhabitants, students
-class(m[, "inhabitants"])      # "numeric": everything is still a number
+students_n <- c(8,1,1,1,1,1,1)
 
+m <- cbind(inhabitants,students=students_n)
+m
+class(m[,"inhabitants"])
 ## Add a text column: is the city at the sea?
-m2 <- cbind(m, sea = c("NO", "YES", "YES", "NO", "NO", "NO", "YES"))
-m2                             # look closely: now ALL values have quotes -> all text!
+
+m2 <- cbind(m, sea = c("NO","YES","YES","NO","NO","NO","YES"))
+m2
+## Add a row
+## Indexing: first row, then column
 
 ## Add a row: rbind() adds a row at the bottom (UEF's second campus, approx. inhabitants)
 m3 <- rbind(m2, Kuopio = c(124000, 0, "NO"))
@@ -441,7 +455,9 @@ m2[, "sea"]                    # one column: sea for all cities
 m2[1, 2]                       # row 1, column 2: Munich's students
 ```
 
-**Task B:** Run `sum(m2[, "inhabitants"])`. What happens and why? How could you have noticed **before** the error?
+**Task B:** Run `sum(m2[, "inhabitants"])`.
+What happens and why?
+How could you have noticed **before** the error?
 
 ```{r task_B, error=TRUE}
 ## error=TRUE: show the error in the HTML and keep knitting
@@ -483,15 +499,28 @@ party <- list(title  = "Course party",                       # one text
               guests = 14)                                   # one number
 str(party)                     # overview: what is in the bag?
 
-## Access elements with $
-party$title
-party$drinks["Munich"]         # first $ to get the drinks, then [ ] to pick one
+party <- list(
+  title = "Empirical Research course party",
+  cities = cities,
+  drinks = c(Munich = "Helles beer",
+             Espoo = "Lonkero",
+             Stockholm = "Akvavit",
+             Mannheim = "Riesling Schorle",
+             Joensuu = "Koskenkorva",
+             Vienna = "Spritzer",
+             Shanghai = "Huangjiu")
+)
+
+names(party)
+party$drinks
 
 ```
 
-## Data frames
+## Data frames (next week!)
 
-A **data frame** is the most important object for data analysis: a rectangle with **columns = variables** and **rows = observations**. Each column has one type, but different columns can have different types. **Tidy data:** every column a variable, every row an observation, every cell a single value.
+A **data frame** is the most important object for data analysis: a rectangle with **columns = variables** and **rows = observations**.
+Each column has one type, but different columns can have different types.
+**Tidy data:** every column a variable, every row an observation, every cell a single value.
 
 Useful functions: `data.frame()`, `head()`, `str()`, `nrow()`, `ncol()`, `summary()`, `subset()`, `df$column`.
 
@@ -500,27 +529,18 @@ Useful functions: `data.frame()`, `head()`, `str()`, `nrow()`, `ncol()`, `summar
 ```{r chunk_4_6}
 ## One row per city
 df_cities <- data.frame(
-  city        = cities,                                           # character
-  country     = country,                                          # factor
-  inhabitants = inhabitants,                                      # numeric
-  at_sea      = c(FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE),  # logical
-  drink       = c("Helles beer", "Lonkero", "Akvavit", "Riesling Schorle",
-                  "Koskenkorva", "Spritzer", "Huangjiu"),         # character
-  drink_free  = c("Spezi", "Jaffa", "Julmust", "Apfelschorle",
-                  "Kotikalja", "Almdudler", "Suanmeitang")        # character
+  city = cities,
+  country = country,
+  inhabitants = inhabitants,
+  sea = c(FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE),
+  drink = unname(party$drinks),
+  row.names = NULL
 )
-
-## Look at it
 df_cities
-str(df_cities)                 # one type per column - no matrix trap!
-nrow(df_cities)                # number of rows (cities)
-ncol(df_cities)                # number of columns (variables)
-summary(df_cities)             # quick overview of every column
-
-## Work with it
-df_cities$inhabitants                       # one column with $
-sum(df_cities$inhabitants)                  # works: the column stayed numeric
-subset(df_cities, inhabitants < 1e6)        # only cities below 1 million
+str(df_cities)
+sum(df_cities$inhabitants)
+subset(df_cities, inhabitants < 1e6)
+subset(df_cities, sea)
 
 ```
 
@@ -539,30 +559,19 @@ students <- data.frame(
 
 ```{r chunk_4_6b}
 ## Explore the students data
-## Explore the students data
-head(students)                 # first 6 rows
-str(students)                  # 12 obs. of 3 variables, all chr (text)
-nrow(students)                 # 12 students
-
-## How many students per city / university?
-table(students$city)           # Munich 8, the others 1 each
-table(students$university)
-
-## Check with what we know: 8 LMU students in Munich, 12 in total
-sum(students$city == "Munich")       # should be 8
-length(unique(students$city))        # number of different cities: 5
-
+head(students)
+nrow(students)
+table(students$city)
 ```
 
-**Task C · Party planning:** Every student brings the drink of their (home) city. How many bottles of each drink do we need? Check your result against what you know about the class.
+**Task C · Party planning:** Every student brings the drink of their (home) city.
+How many bottles of each drink do we need?
+Check your result against what you know about the class.
 
 ```{r task_C}
 ## Look up each student's drink in df_cities (a first "merge" — more in Tutorial 2)
-## match() finds, for each student's city, the row of that city in df_cities
 students$drink <- df_cities$drink[match(students$city, df_cities$city)]
-students                                  # every student now has a drink
-table(students$drink)                     # bottles needed per drink
-
+students[,c("student_id","city","drink")]
 ## Check with what we know: 8 LMU students -> should be 8 x Helles beer
 sum(students$drink == "Helles beer")      # 8
 sum(table(students$drink))                # 12 bottles in total = 12 students
@@ -578,7 +587,10 @@ table(party_merge$drink.y)                # same counts as above?
 
 # Part 5 · Packages and importing Compustat
 
-**Packages** are collections of functions. Install once per laptop with `install.packages("name")` (or *Tools → Install Packages*), load in every session with `library(name)`. Load all packages at the top of a document. If two packages have functions with the same name, write `package::function()`.
+**Packages** are collections of functions.
+Install once per laptop with `install.packages("name")` (or *Tools → Install Packages*), load in every session with `library(name)`.
+Load all packages at the top of a document.
+If two packages have functions with the same name, write `package::function()`.
 
 The **tidyverse** is a collection of packages for data analysis: `readr` (import), `dplyr` (manipulation), `ggplot2` (graphics), `tidyr`, `tibble` …
 
@@ -586,105 +598,83 @@ The **tidyverse** is a collection of packages for data analysis: `readr` (import
 
 ```{r chunk_5_1}
 ## install.packages("tidyverse")   # once per laptop, in the Console
-
 library(tidyverse)
 library(here)
+
 ```
 
-Our data: **Compustat North America**, all public U.S. and Canadian firms, fiscal years 2010–2014 — downloaded from WRDS. Licensed data: it stays in `data/`, it is not pushed to GitHub, and it is not pasted into public AI tools.
+Our data: **Compustat North America**, all public U.S. and Canadian firms, fiscal years 2010–2014 — downloaded from WRDS.
+Licensed data: it stays in `data/`, it is not pushed to GitHub, and it is not pasted into public AI tools.
 
+|  |  |  |  |
+|------------------|------------------|------------------|------------------|
 | File | Separator | Decimal | Function |
-|-----------------|---------------------|-----------------|-------------------|
 | `compustat.csv` | `,` | `.` | `read_csv()` (readr) or `read.csv()` (base R) |
 | `compustat_German_format.csv` | `;` | `,` | `read_csv2()` or `read.csv2()` |
 
 ### Chunk 5.2 · Import the same data three ways
 
-## One-time step, run in the Console: copy the Moodle data from Downloads into data/
-## file.copy(from = c("C:/Users/am/Downloads/compustat.csv",
-##                    "C:/Users/am/Downloads/compustat_German_format.csv"),
-##           to   = here("data"))
-## list.files(here("data"))   # check: both files should be listed
-
 ```{r chunk_5_2}
-## Import the same data three ways
-
-## 1. readr (tidyverse): read_csv() for , separator and . decimals
 cs <- read_csv(here("data", "compustat.csv"))
-
-## 2. base R: read.csv() - same file, older built-in function
 cs_b <- read.csv(here("data", "compustat.csv"))
-
-## 3. readr: read_csv2() for the German format (; separator, , decimals)
 cs_g <- read_csv2(here("data", "compustat_German_format.csv"))
 
-## First look: size of each import (rows, columns)
 dim(cs)
-dim(cs_b)
-dim(cs_g)
-
 ```
 
 ### Chunk 5.3 · Same file, same data? Compare!
 
 ```{r chunk_5_3}
 ## 1. The identifier gvkey
-head(cs$gvkey, 2)       # readr:  "001004" "001004"  -> text, zeros kept
-head(cs_b$gvkey, 2)     # base R: 1004 1004          -> number, zeros gone!
-class(cs$gvkey)         # "character"
-class(cs_b$gvkey)       # "integer"
-
+head(cs$gvkey, 3)
+head(cs_b$gvkey,3)
+head(cs_g$gvkey,3)
+class(cs$gvkey); class(cs_b$gvkey); class(cs_g$gvkey)
 ## 2. Type guessing: readr guesses column types from the first 1,000 rows
-problems(cs)            # list of cells readr could not read -> set to NA
-nrow(problems(cs))      # how many? (slides: 94)
-
+problems(cs)
+unique(problems(cs)$col)
+names(cs)[unique(problems(cs)$col)]
 ## 3. A safer import: tell R the types instead of letting it guess
-cs_safe <- read_csv(here("data", "compustat.csv"),
-                    col_types = cols(gvkey = "c"),   # gvkey is a code -> character
-                    guess_max = Inf)                 # look at ALL rows before guessing types
-nrow(problems(cs_safe)) # should be 0 now
-
+cs <- read_csv(here("data","compustat.csv"),
+               col_types = cols(gvkey = col_character()),
+               guess_max = Inf)
+nrow(problems(cs))
 ## 4. Do the numbers agree across the imports?
-sum(cs$at,      na.rm = TRUE)    # total assets, readr
-sum(cs_b$at,    na.rm = TRUE)    # base R
-sum(cs_g$at,    na.rm = TRUE)    # German format
-sum(cs_safe$at, na.rm = TRUE)    # safe import
-all.equal(cs_safe$at, cs_g$at)   # TRUE = same values (with tiny tolerance)
+all.equal(sum(cs$at, na.rm =TRUE), sum(cs_g$at, na.rm=TRUE))
+
 ```
 
-**Your conclusion:** what differs between the three imports — and which one would you trust? Why?
-Conclusion:
-- read.csv() drops the leading zeros of gvkey ("001004" -> 1004), so merges would fail.
-- read_csv() and read_csv2() keep gvkey, but guess types from the first 1,000 rows and silently set 94 values to NA.
-- I trust the safe import: fixed types (gvkey = character) and guess_max = Inf, so nothing is lost.
+**Your conclusion:** what differs between the three imports — and which one would you trust?
+Why?
 
 ### Chunk 5.4 · Five checks after every import
 
 ```{r chunk_5_4}
-## Use the safe import from Chunk 5.3
-## 1. Size: rows and columns as expected?
-dim(cs_safe)
-
-## 2. Types: numbers numeric, codes text, dates dates?
-cs_safe                          # prints first rows + type of each column (<chr>, <dbl>, ...)
-
+## 1. Size
+dim(cs)
+## 2. Types
+print(cs)
 ## 3. Keys: one row per firm-year?
-nrow(cs_safe)                    # number of rows
-n_distinct(cs_safe$gvkey, cs_safe$fyear)   # number of unique firm-year combinations
-## if these two differ, some firm-years appear more than once (slides: 63,393 vs 57,276)
+nrow(cs)
+n_distinct(cs$gvkey, cs$fyear)
+cs |> count(gvkey, fyear) |> filter(n > 1) |>  head()
+table(cs$indfmt)  # INDL = industrial, FS = financial service format
+
 
 ## 4. Ranges and missing values
-summary(cs_safe$at)              # min, max, mean, number of NAs of total assets
-sum(cs_safe$at < 0, na.rm = TRUE)   # negative total assets? should be 0
-table(cs_safe$fyear)             # all years 2010-2014 present?
+
+summary(cs$at)
+summary(cs$fyear)
+table(cs$curcd)
 
 ## 5. Known value: Apple's total assets, fiscal year 2014 (in USD millions)
-## Apple's gvkey is "001690"; the 10-K reports 231,839
-filter(cs_safe, gvkey == "001690", fyear == 2014) |>
-  select(gvkey, fyear, at, any_of(c("conm", "indfmt", "curcd")))
+cs |> filter(tic == "AAPL", fyear == 2014) |>  select(conm, fyear, at, sale, ni)
+
 ```
 
-**Task D:** Run the five checks above. What surprises you? Note two or three observations as text below the chunk.
+**Task D:** Run the five checks above.
+What surprises you?
+Note two or three observations as text below the chunk.
 
 ```{r task_D}
 ## Your extra checks
@@ -706,17 +696,18 @@ sum(is.na(cs_safe$at))
 
 ```
 
-*Teaser for Tutorial 2:* compare `nrow(cs)` with `n_distinct(cs$gvkey, cs$fyear)`. What do you see — and why? (Hint: `indfmt`.)
+*Teaser for Tutorial 2:* compare `nrow(cs)` with `n_distinct(cs$gvkey, cs$fyear)`.
+What do you see — and why?
+(Hint: `indfmt`.)
 
 ### Chunk 5.5 · Export and clean up
 
 ```{r chunk_5_5}
 ## Export: always to output/, never overwrite raw data in data/
-write_csv(df_cities, here("output", "df_cities.csv"))   # save our city table as CSV
-file.exists(here("output", "df_cities.csv"))            # check: TRUE
-
+dir.create(here("output"), showWarnings = FALSE)
+write_csv(df_cities, here("output", "student_cities.csv"))
 ## Remove objects we no longer need
-rm(cs_b, cs_g)          # the comparison imports have done their job
+rm(cs_b, cs_g)
 
 ## Remove everything (same as the broom icon in the Environment pane)
 ## rm(list = ls())
@@ -726,9 +717,17 @@ rm(cs_b, cs_g)          # the comparison imports have done their job
 
 # Part 6 · Coding with AI: bug hunt
 
-The script below was "written by an AI" for the prompt *"Summarise our student cities and the Compustat data."* It looks plausible. Some lines run without any error — and are still wrong.
+The script below was "written by an AI" for the prompt *"Summarise our student cities and the Compustat data."* It looks plausible.
+Some lines run without any error — and are still wrong.
 
-**Round 1 (10 min, by hand):** Run the chunk. Mark every bug with a comment `# BUG:` and a reason. Use what you know about our cities. **Round 2 (10 min, with AI):** Give the script of chunk 6.1 to an AI tool of your choice (for example the Posit Assistant in RStudio or a chat assistant in the browser) — the code only, **never the Compustat data**: *"Review this R code for bugs. For each bug, explain why it is a bug and how to fix it."* Compare with your list. **Round 3 (5 min):** Which bugs did the AI find that you missed? Which did it miss? Did it invent a bug? What does that mean for how you use AI?
+**Round 1 (10 min, by hand):** Run the chunk.
+Mark every bug with a comment `# BUG:` and a reason.
+Use what you know about our cities.
+**Round 2 (10 min, with AI):** Give the script of chunk 6.1 to an AI tool of your choice (for example the Posit Assistant in RStudio or a chat assistant in the browser) — the code only, **never the Compustat data**: *"Review this R code for bugs. For each bug, explain why it is a bug and how to fix it."* Compare with your list.
+**Round 3 (5 min):** Which bugs did the AI find that you missed?
+Which did it miss?
+Did it invent a bug?
+What does that mean for how you use AI?
 
 ### Chunk 6.1 · The AI-generated script
 
@@ -742,11 +741,11 @@ city_info$n_students <- c(as.numeric(n_per_city), 0, 0)   # BUG: matches by POSI
 city_info[, c("city", "n_students")]
 
 ## (b) Population in millions
-city_info$inhabitants_m <- city_info$inhabitants / 1e5    # BUG: 1e5 = 100,000, not a million. Munich shows 15.1 instead of 1.51. Should be 1e6.
+city_info$inhabitants_m <- city_info$inhabitants / 1e6
 city_info[, c("city", "inhabitants_m")]
 
 ## (c) German cities only
-german <- subset(city_info, country = "Germany")          # BUG: = instead of ==. "=" is read as an (ignored) argument, so nothing is filtered -> 7 rows instead of 2 (Munich, Mannheim). No error, no warning.
+german <- subset(city_info, country == "Germany")
 nrow(german)
 
 ## (d) Average sales of Compustat firms
@@ -763,17 +762,14 @@ summarise_median(cs, at, by = fyear)                       # BUG: this function 
 
 ### Chunk 6.2 · Solution: bugs, fixes and checks
 
-Write your corrected version below. After every fix, check the result against something you know (e.g., Munich has 8 students).
+Write your corrected version below.
+After every fix, check the result against something you know (e.g., Munich has 8 students).
 
 ```{r chunk_6_2}
 ## (a) match by name, not by position — and check with known values
-city_info <- df_cities
-city_info$n_students <- as.numeric(n_per_city[city_info$city])   # look up each city BY NAME
-city_info$n_students[is.na(city_info$n_students)] <- 0           # Vienna, Shanghai: no home students -> 0
-city_info[, c("city", "n_students")]
-city_info$n_students[city_info$city == "Munich"]   # check: must be 8
-sum(city_info$n_students)                          # check: must be 12
-
+city_info$n_students <- as.numeric(n_per_city[city_info$city])
+city_info$n_students[is.na(city_info$n_students)] <- 0
+city_info[,c("city","n_students")]
 ## (b) millions — check: Munich must be about 1.5
 city_info$inhabitants_m <- city_info$inhabitants / 1e6
 city_info$inhabitants_m[city_info$city == "Munich"]   # check: 1.51
@@ -783,11 +779,9 @@ german <- subset(city_info, country == "Germany")
 nrow(german)                                       # check: 2 (Munich, Mannheim)
 
 ## (d) units and currency: Compustat items are in millions of the reporting currency
-## use the safe import; one format only (indfmt) to avoid double rows; average per currency
-cs_safe |>
-  filter(indfmt == "INDL") |>
-  group_by(curcd) |>
-  summarise(avg_sales_millions = mean(sale, na.rm = TRUE), n = n())
+cs |> 
+  group_by(curcd) |> 
+  summarise(n = n(), avg_sales_millions = mean(sale, na.rm = TRUE))
 
 ## (e) firms vs. firm-years
 nrow(cs_safe)                    # rows (firm-years, incl. duplicates)
