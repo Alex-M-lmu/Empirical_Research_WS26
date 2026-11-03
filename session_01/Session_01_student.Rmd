@@ -198,9 +198,20 @@ The assignment operator is the arrow `<-` (shortcut `Alt + -`). `=` also works b
 
 ```{r chunk_3_1}
 ## Assign values to objects (no output)
-## Fun with floating point: Euler's identity e^(i*pi) + 1 = 0
-## Lesson: never test numbers with == after calculations, use all.equal()
+1 + 1
+5 * (4 - 1)^2
+sqrt(log(10))      # functions can be nested: first log(10), then the square root
 
+## Fun with floating point: Euler's identity e^(i*pi) + 1 = 0
+## Assign values to objects (no output)
+x <- 5             # "x gets 5": stored in memory, appears in the Environment pane
+X <- 6             # different object! R is case-sensitive (x ≠ X)
+x^2                # use the object in a calculation
+
+## Lesson: never test numbers with == after calculations, use all.equal()
+## Fun with floating point: Euler's identity e^(i*pi) + 1 = 0
+exp(1i * pi) + 1   # should be exactly 0, but R shows a tiny rounding error (~1e-16)
+0.1 + 0.2 == 0.3   # FALSE! Same problem: computers store decimals only approximately
 
 ```
 
@@ -211,9 +222,21 @@ R works with objects: numbers, text, vectors, matrices, data frames, functions, 
 ### Chunk 3.2 · Data types
 
 ```{r chunk_3_2}
-## Conversion
-## Delete an object
+## Data types: class() tells you what type an object is
+class(42)          # "numeric"   = number
+class("Munich")    # "character" = text (always in quotes)
+class(TRUE)        # "logical"   = TRUE / FALSE
+class(42L)         # "integer"   = whole number (the L makes it integer)
 
+## Conversion
+as.character(42)   # number -> text: "42"
+as.numeric("42")   # text -> number: 42
+as.numeric("Munich")   # text that isn't a number -> NA (= missing value)
+as.numeric("001004")   # -> 1004: leading zeros are lost!
+
+## Delete an object
+y <- 10            # create an object (appears in the Environment)
+rm(y)              # delete it (disappears from the Environment)
 
 ```
 
@@ -230,6 +253,25 @@ R works with objects: numbers, text, vectors, matrices, data frames, functions, 
 | And                      | `a & b`  |
 
 ```{r chunk_3_3}
+## Logical operators: every comparison returns TRUE or FALSE
+x <- 5
+y <- 3
+
+x == y        # equal to?                 FALSE
+x < y         # less than?                FALSE
+x >= y        # greater than or equal?    TRUE
+x != y        # not equal?                TRUE
+
+## Combine conditions
+a <- x > 4    # TRUE
+b <- y > 4    # FALSE
+
+!b            # not:  turns FALSE into TRUE
+a | b         # or:   TRUE if at least one is TRUE  -> TRUE
+a & b         # and:  TRUE only if both are TRUE    -> FALSE
+
+## Common mistake: = assigns, == compares
+x == 3        # asks "is x 3?"  -> FALSE
 
 
 ```
@@ -282,30 +324,74 @@ The simplest way to collect many values is a **vector**: `c(value1, value2, ...)
 ### Chunk 4.1 · Create vectors
 
 ```{r chunk_4_1}
+## Create vectors: c() = "combine" several values into one vector
+cities <- c("Munich", "Espoo", "Stockholm",
+            "Mannheim", "Joensuu", "Vienna", "Shanghai")
+inhabitants <- c(1510000, 320000, 990000,
+                 315000, 78000, 2000000, 24900000)
+
 ## Give the elements names
+names(inhabitants) <- cities   # each number gets its city as a label
+inhabitants
+
 ## Vector functions
+length(cities)          # number of elements: 7
+sum(inhabitants)        # total inhabitants
+mean(inhabitants)       # average
+max(inhabitants)        # largest value
+min(inhabitants)        # smallest value
+sort(inhabitants)       # sorted from small to large
+
 ## Special vectors
+1:10                    # sequence 1, 2, ..., 10
+seq(1, 10, 2)           # from 1 to 10 in steps of 2: 1 3 5 7 9
+rep("beer", 3)          # "beer" three times
+
 ## Calculations work element by element
-
-
+inhabitants / 1e6       # every city in millions (1e6 = 1,000,000)
+sum(inhabitants) / 1e6  # total in millions
 ```
 
 ### Chunk 4.2 · Indexing
 
 ```{r chunk_4_2}
+## Indexing = picking elements out of a vector with [ ]
 
+## By position (R starts counting at 1, not 0)
+cities[1]                  # first element: "Munich"
+cities[c(2, 3)]            # second and third element
+cities[-1]                 # all EXCEPT the first
+
+## By name (works because we gave inhabitants names)
+inhabitants["Vienna"]
+inhabitants[c("Munich", "Mannheim")]
+
+## By condition: TRUE/FALSE for each element, keep the TRUE ones
+inhabitants > 1e6                  # check: which cities have more than 1 million?
+inhabitants[inhabitants > 1e6]     # keep only those
 
 ```
 
 **Task A1:** Which of "your" cities have more than 1 million inhabitants? How many are they?
 
 ```{r task_A1}
+## Which cities have more than 1 million inhabitants?
+big <- inhabitants[inhabitants > 1e6]   # keep only cities with > 1 million
+names(big)                              # their names
 
+## How many are they?
+length(big)                             # count the elements
+sum(inhabitants > 1e6)                  # alternative: TRUE counts as 1, FALSE as 0
+
+## Check with what we know: Munich (1.51 m), Vienna (2.0 m), Shanghai (24.9 m) -> 3
 
 ```
 
 **Task A2 (verification):** Look up the population of *one* city in an official source (e.g., the statistical office of the country). Is our rounded number close enough? What exactly is counted — city proper or metropolitan area?
-
+- Our number (1,510,000) matches the official state/federal figure for the city proper (about 1.51 million, 2024).
+- The city's own statistical office reports more, because it counts from the residents' register instead of the census.
+- Lesson: a plausible number isn't enough, always check what is measured and by whom.
+  
 ## Factors
 
 A **factor** maps labels to an underlying integer code. Factors are useful for categories such as countries, industries or audit firms.
@@ -313,7 +399,19 @@ A **factor** maps labels to an underlying integer code. Factors are useful for c
 ### Chunk 4.3 · Factors
 
 ```{r chunk_4_3}
+## Factor = category variable: labels stored with an integer code behind them
+country <- factor(c("Germany", "Finland", "Sweden",
+                    "Germany", "Finland", "Austria", "China"))
+country
 
+## The categories (levels), sorted alphabetically
+levels(country)
+
+## How often does each category occur?
+table(country)
+
+## Behind the scenes: each label is a number (its position in levels)
+as.integer(country)
 
 ```
 
@@ -324,17 +422,44 @@ A **factor** maps labels to an underlying integer code. Factors are useful for c
 ### Chunk 4.4 · Matrices
 
 ```{r chunk_4_4}
+## Create a matrix: cbind() puts vectors side by side as columns
+m <- cbind(inhabitants, students = c(8, 1, 1, 1, 1, 1, 1))
+m                              # rows = cities (from the names), columns = inhabitants, students
+class(m[, "inhabitants"])      # "numeric": everything is still a number
+
 ## Add a text column: is the city at the sea?
-## Add a row
-## Indexing: first row, then column
+m2 <- cbind(m, sea = c("NO", "YES", "YES", "NO", "NO", "NO", "YES"))
+m2                             # look closely: now ALL values have quotes -> all text!
 
+## Add a row: rbind() adds a row at the bottom (UEF's second campus, approx. inhabitants)
+m3 <- rbind(m2, Kuopio = c(124000, 0, "NO"))
+m3
 
+## Indexing: first row, then column  -> m[row, column]
+m2["Munich", ]                 # one row: everything about Munich
+m2[, "sea"]                    # one column: sea for all cities
+m2[1, 2]                       # row 1, column 2: Munich's students
 ```
 
 **Task B:** Run `sum(m2[, "inhabitants"])`. What happens and why? How could you have noticed **before** the error?
 
 ```{r task_B, error=TRUE}
+## error=TRUE: show the error in the HTML and keep knitting
 
+## What happens?
+sum(m2[, "inhabitants"])        # Error: invalid 'type' (character) of argument
+
+## Why? The column is text, not numbers
+class(m2[, "inhabitants"])      # "character"
+
+## How could I have noticed BEFORE the error?
+class(m[, "inhabitants"])       # "numeric" -> fine before the text column was added
+str(m2)                         # chr = character for the whole matrix
+
+## Fix 1: convert back to numbers
+sum(as.numeric(m2[, "inhabitants"]))
+
+## Fix 2 (better): keep mixed types in a data frame (Chunk 4.6)
 
 ```
 
@@ -345,7 +470,22 @@ A **list** is a bag that can hold any objects of any length and type.
 ### Chunk 4.5 · Lists
 
 ```{r chunk_4_5}
+## A list can hold objects of different types AND lengths
+party <- list(title  = "Course party",                       # one text
+              cities = cities,                               # vector of 7 texts
+              drinks = c(Munich    = "Helles beer",
+                         Espoo     = "Lonkero",
+                         Stockholm = "Akvavit",
+                         Mannheim  = "Riesling Schorle",
+                         Joensuu   = "Koskenkorva",
+                         Vienna    = "Spritzer",
+                         Shanghai  = "Huangjiu"),            # named vector of 7 texts
+              guests = 14)                                   # one number
+str(party)                     # overview: what is in the bag?
 
+## Access elements with $
+party$title
+party$drinks["Munich"]         # first $ to get the drinks, then [ ] to pick one
 
 ```
 
@@ -359,7 +499,28 @@ Useful functions: `data.frame()`, `head()`, `str()`, `nrow()`, `ncol()`, `summar
 
 ```{r chunk_4_6}
 ## One row per city
+df_cities <- data.frame(
+  city        = cities,                                           # character
+  country     = country,                                          # factor
+  inhabitants = inhabitants,                                      # numeric
+  at_sea      = c(FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE),  # logical
+  drink       = c("Helles beer", "Lonkero", "Akvavit", "Riesling Schorle",
+                  "Koskenkorva", "Spritzer", "Huangjiu"),         # character
+  drink_free  = c("Spezi", "Jaffa", "Julmust", "Apfelschorle",
+                  "Kotikalja", "Almdudler", "Suanmeitang")        # character
+)
 
+## Look at it
+df_cities
+str(df_cities)                 # one type per column - no matrix trap!
+nrow(df_cities)                # number of rows (cities)
+ncol(df_cities)                # number of columns (variables)
+summary(df_cities)             # quick overview of every column
+
+## Work with it
+df_cities$inhabitants                       # one column with $
+sum(df_cities$inhabitants)                  # works: the column stayed numeric
+subset(df_cities, inhabitants < 1e6)        # only cities below 1 million
 
 ```
 
@@ -378,7 +539,18 @@ students <- data.frame(
 
 ```{r chunk_4_6b}
 ## Explore the students data
+## Explore the students data
+head(students)                 # first 6 rows
+str(students)                  # 12 obs. of 3 variables, all chr (text)
+nrow(students)                 # 12 students
 
+## How many students per city / university?
+table(students$city)           # Munich 8, the others 1 each
+table(students$university)
+
+## Check with what we know: 8 LMU students in Munich, 12 in total
+sum(students$city == "Munich")       # should be 8
+length(unique(students$city))        # number of different cities: 5
 
 ```
 
@@ -386,10 +558,20 @@ students <- data.frame(
 
 ```{r task_C}
 ## Look up each student's drink in df_cities (a first "merge" — more in Tutorial 2)
+## match() finds, for each student's city, the row of that city in df_cities
+students$drink <- df_cities$drink[match(students$city, df_cities$city)]
+students                                  # every student now has a drink
+table(students$drink)                     # bottles needed per drink
+
 ## Check with what we know: 8 LMU students -> should be 8 x Helles beer
+sum(students$drink == "Helles beer")      # 8
+sum(table(students$drink))                # 12 bottles in total = 12 students
+sum(is.na(students$drink))                # 0 = no student without a drink
+
 ## Alternative with the same answer (independent implementation)
-
-
+## merge() joins the two tables by the common column "city"
+party_merge <- merge(students, df_cities[, c("city", "drink")], by = "city")
+table(party_merge$drink.y)                # same counts as above?
 ```
 
 ------------------------------------------------------------------------
@@ -405,7 +587,8 @@ The **tidyverse** is a collection of packages for data analysis: `readr` (import
 ```{r chunk_5_1}
 ## install.packages("tidyverse")   # once per laptop, in the Console
 
-
+library(tidyverse)
+library(here)
 ```
 
 Our data: **Compustat North America**, all public U.S. and Canadian firms, fiscal years 2010–2014 — downloaded from WRDS. Licensed data: it stays in `data/`, it is not pushed to GitHub, and it is not pasted into public AI tools.
@@ -417,8 +600,28 @@ Our data: **Compustat North America**, all public U.S. and Canadian firms, fisca
 
 ### Chunk 5.2 · Import the same data three ways
 
-```{r chunk_5_2}
+## One-time step, run in the Console: copy the Moodle data from Downloads into data/
+## file.copy(from = c("C:/Users/am/Downloads/compustat.csv",
+##                    "C:/Users/am/Downloads/compustat_German_format.csv"),
+##           to   = here("data"))
+## list.files(here("data"))   # check: both files should be listed
 
+```{r chunk_5_2}
+## Import the same data three ways
+
+## 1. readr (tidyverse): read_csv() for , separator and . decimals
+cs <- read_csv(here("data", "compustat.csv"))
+
+## 2. base R: read.csv() - same file, older built-in function
+cs_b <- read.csv(here("data", "compustat.csv"))
+
+## 3. readr: read_csv2() for the German format (; separator, , decimals)
+cs_g <- read_csv2(here("data", "compustat_German_format.csv"))
+
+## First look: size of each import (rows, columns)
+dim(cs)
+dim(cs_b)
+dim(cs_g)
 
 ```
 
@@ -426,25 +629,59 @@ Our data: **Compustat North America**, all public U.S. and Canadian firms, fisca
 
 ```{r chunk_5_3}
 ## 1. The identifier gvkey
+head(cs$gvkey, 2)       # readr:  "001004" "001004"  -> text, zeros kept
+head(cs_b$gvkey, 2)     # base R: 1004 1004          -> number, zeros gone!
+class(cs$gvkey)         # "character"
+class(cs_b$gvkey)       # "integer"
+
 ## 2. Type guessing: readr guesses column types from the first 1,000 rows
+problems(cs)            # list of cells readr could not read -> set to NA
+nrow(problems(cs))      # how many? (slides: 94)
+
 ## 3. A safer import: tell R the types instead of letting it guess
+cs_safe <- read_csv(here("data", "compustat.csv"),
+                    col_types = cols(gvkey = "c"),   # gvkey is a code -> character
+                    guess_max = Inf)                 # look at ALL rows before guessing types
+nrow(problems(cs_safe)) # should be 0 now
+
 ## 4. Do the numbers agree across the imports?
-
-
+sum(cs$at,      na.rm = TRUE)    # total assets, readr
+sum(cs_b$at,    na.rm = TRUE)    # base R
+sum(cs_g$at,    na.rm = TRUE)    # German format
+sum(cs_safe$at, na.rm = TRUE)    # safe import
+all.equal(cs_safe$at, cs_g$at)   # TRUE = same values (with tiny tolerance)
 ```
 
 **Your conclusion:** what differs between the three imports — and which one would you trust? Why?
+Conclusion:
+- read.csv() drops the leading zeros of gvkey ("001004" -> 1004), so merges would fail.
+- read_csv() and read_csv2() keep gvkey, but guess types from the first 1,000 rows and silently set 94 values to NA.
+- I trust the safe import: fixed types (gvkey = character) and guess_max = Inf, so nothing is lost.
 
 ### Chunk 5.4 · Five checks after every import
 
 ```{r chunk_5_4}
-## 1. Size
-## 2. Types
+## Use the safe import from Chunk 5.3
+## 1. Size: rows and columns as expected?
+dim(cs_safe)
+
+## 2. Types: numbers numeric, codes text, dates dates?
+cs_safe                          # prints first rows + type of each column (<chr>, <dbl>, ...)
+
 ## 3. Keys: one row per firm-year?
+nrow(cs_safe)                    # number of rows
+n_distinct(cs_safe$gvkey, cs_safe$fyear)   # number of unique firm-year combinations
+## if these two differ, some firm-years appear more than once (slides: 63,393 vs 57,276)
+
 ## 4. Ranges and missing values
+summary(cs_safe$at)              # min, max, mean, number of NAs of total assets
+sum(cs_safe$at < 0, na.rm = TRUE)   # negative total assets? should be 0
+table(cs_safe$fyear)             # all years 2010-2014 present?
+
 ## 5. Known value: Apple's total assets, fiscal year 2014 (in USD millions)
-
-
+## Apple's gvkey is "001690"; the 10-K reports 231,839
+filter(cs_safe, gvkey == "001690", fyear == 2014) |>
+  select(gvkey, fyear, at, any_of(c("conm", "indfmt", "curcd")))
 ```
 
 **Task D:** Run the five checks above. What surprises you? Note two or three observations as text below the chunk.
@@ -452,6 +689,20 @@ Our data: **Compustat North America**, all public U.S. and Canadian firms, fisca
 ```{r task_D}
 ## Your extra checks
 
+## Why are there more rows than firm-years? Look at the duplicates
+cs_safe |>
+  count(gvkey, fyear) |>         # how many rows per firm-year?
+  filter(n > 1) |>               # keep only firm-years that appear more than once
+  head()
+
+## Is it the indfmt column (industrial vs. financial services format)?
+table(cs_safe$indfmt)
+
+## Two currencies? (US and Canadian firms)
+table(cs_safe$curcd)
+
+## How many firms have no total assets at all?
+sum(is.na(cs_safe$at))
 
 ```
 
@@ -461,11 +712,14 @@ Our data: **Compustat North America**, all public U.S. and Canadian firms, fisca
 
 ```{r chunk_5_5}
 ## Export: always to output/, never overwrite raw data in data/
+write_csv(df_cities, here("output", "df_cities.csv"))   # save our city table as CSV
+file.exists(here("output", "df_cities.csv"))            # check: TRUE
+
 ## Remove objects we no longer need
+rm(cs_b, cs_g)          # the comparison imports have done their job
+
 ## Remove everything (same as the broom icon in the Environment pane)
 ## rm(list = ls())
-
-
 ```
 
 ------------------------------------------------------------------------
@@ -484,27 +738,27 @@ The script below was "written by an AI" for the prompt *"Summarise our student c
 ## (a) Number of students per city, added to the city table
 n_per_city <- table(students$city)
 city_info <- df_cities
-city_info$n_students <- c(as.numeric(n_per_city), 0, 0)
+city_info$n_students <- c(as.numeric(n_per_city), 0, 0)   # BUG: matches by POSITION, not by name. table() sorts alphabetically (Espoo, Joensuu, Mannheim, Munich, Stockholm), df_cities starts with Munich -> Munich gets 1, Mannheim gets 8. Runs without error, but wrong.
 city_info[, c("city", "n_students")]
 
 ## (b) Population in millions
-city_info$inhabitants_m <- city_info$inhabitants / 1e5
+city_info$inhabitants_m <- city_info$inhabitants / 1e5    # BUG: 1e5 = 100,000, not a million. Munich shows 15.1 instead of 1.51. Should be 1e6.
 city_info[, c("city", "inhabitants_m")]
 
 ## (c) German cities only
-german <- subset(city_info, country = "Germany")
+german <- subset(city_info, country = "Germany")          # BUG: = instead of ==. "=" is read as an (ignored) argument, so nothing is filtered -> 7 rows instead of 2 (Munich, Mannheim). No error, no warning.
 nrow(german)
 
 ## (d) Average sales of Compustat firms
 avg_sales <- mean(cs$sale, na.rm = TRUE)
-cat("Average sales in thousand USD:", round(avg_sales), "\n")
+cat("Average sales in thousand USD:", round(avg_sales), "\n")   # BUG: Compustat values are in MILLIONS, not thousands. Also not all USD: Canadian firms report in CAD (curcd), so the mean mixes two currencies.
 
 ## (e) Number of firms in the sample
-n_firms <- nrow(cs)
+n_firms <- nrow(cs)                                        # BUG: nrow() counts rows = firm-years (plus duplicate rows), not firms. Firms = n_distinct(cs$gvkey).
 cat("Number of firms:", n_firms, "\n")
 
 ## (f) Median total assets by fiscal year
-summarise_median(cs, at, by = fyear)
+summarise_median(cs, at, by = fyear)                       # BUG: this function does not exist (AI "hallucination") -> Error: could not find function.
 ```
 
 ### Chunk 6.2 · Solution: bugs, fixes and checks
@@ -513,13 +767,45 @@ Write your corrected version below. After every fix, check the result against so
 
 ```{r chunk_6_2}
 ## (a) match by name, not by position — and check with known values
+city_info <- df_cities
+city_info$n_students <- as.numeric(n_per_city[city_info$city])   # look up each city BY NAME
+city_info$n_students[is.na(city_info$n_students)] <- 0           # Vienna, Shanghai: no home students -> 0
+city_info[, c("city", "n_students")]
+city_info$n_students[city_info$city == "Munich"]   # check: must be 8
+sum(city_info$n_students)                          # check: must be 12
+
 ## (b) millions — check: Munich must be about 1.5
+city_info$inhabitants_m <- city_info$inhabitants / 1e6
+city_info$inhabitants_m[city_info$city == "Munich"]   # check: 1.51
+
 ## (c) comparison with == ; check: we know there are exactly two German cities
+german <- subset(city_info, country == "Germany")
+nrow(german)                                       # check: 2 (Munich, Mannheim)
+
 ## (d) units and currency: Compustat items are in millions of the reporting currency
+## use the safe import; one format only (indfmt) to avoid double rows; average per currency
+cs_safe |>
+  filter(indfmt == "INDL") |>
+  group_by(curcd) |>
+  summarise(avg_sales_millions = mean(sale, na.rm = TRUE), n = n())
+
 ## (e) firms vs. firm-years
+nrow(cs_safe)                    # rows (firm-years, incl. duplicates)
+n_distinct(cs_safe$gvkey)        # number of firms: much smaller
+
 ## (f) an existing function — and an independent implementation as check
+## Version 1: dplyr
+med_dplyr <- cs_safe |>
+  group_by(fyear) |>
+  summarise(median_at = median(at, na.rm = TRUE))
+med_dplyr
 
+## Version 2: base R (independent implementation)
+med_base <- tapply(cs_safe$at, cs_safe$fyear, median, na.rm = TRUE)
+med_base
 
+## Do both agree?
+all.equal(as.numeric(med_base), med_dplyr$median_at)   # TRUE = same result
 ```
 
 ------------------------------------------------------------------------
